@@ -1,0 +1,36 @@
+================================================================================
+EE136 CAPSTONE MINI-PROJECT - TOPIC 02: ROOT-CAUSE FAILURE ANALYSIS REPORT
+================================================================================
+
+[1] LOW-SNR NOISE COLLAPSE REGIME (SNR = -4 dB):
+  • Feature-Based XGBoost Accuracy: 25.83%
+  • End-to-End 1D-CNN Accuracy:    40.83% (Delta = +15.00%)
+  • Physical Root Cause:
+    Higher-Order Cumulants (C40, C42) depend on 4th moments E[|z|^4] and E[z^4].
+    Under AWGN r[n] = s[n] + w[n], expanding |r[n]|^4 yields severe noise cross-terms:
+      |r[n]|^4 = (|s[n]|^2 + |w[n]|^2 + 2 Re{s[n] w*[n]})^2.
+    Over finite burst length L = 128, the sample variance of the cumulant estimator explodes:
+      Var(C42_est) ~ O(sigma_w^4 / L) or O(sigma_w^8 / L).
+    At SNR = -4 dB, noise power sigma_w^2 > signal power E_s, completely corrupting
+    the cumulant feature space. In contrast, 1D-CNN applies learned spatio-temporal
+    convolutional filters (kernels of size 7, 5, 3) acting as coherent bandpass match-filters
+    that integrate and average out wideband out-of-band Gaussian noise before non-linear activation.
+
+[2] DENSE CONSTELLATION LATTICE AMBIGUITY (16QAM vs. 64QAM @ High SNR >= 10 dB):
+  • XGBoost QAM Discrimination Accuracy: 64.67%
+  • 1D-CNN QAM Discrimination Accuracy:  54.00%
+  • Physical Root Cause:
+    Theoretical 4th-order cumulants of normalized square QAM constellations are mathematically close:
+      C42(16QAM) = -0.6800
+      C42(64QAM) = -0.6190  (Difference delta = 0.061)
+    Under finite-sample estimation (L=128), statistical variance often overlaps this 0.061 gap,
+    causing classical feature classifiers to confuse 16QAM and 64QAM.
+    1D-CNN overcomes this by learning complex transition trajectories and multilevel peak-to-average
+    ratio (PAPR) characteristics across multiple consecutive samples.
+
+[3] CONTINUOUS PHASE TRAJECTORY (CPFSK vs. GFSK):
+  • CPFSK and GFSK both exhibit constant envelopes (|z[n]| = 1.0) and identical C42 = -1.0.
+  • However, their differential phase statistics (Delta_phi) and FFT Spectral Spread differ sharply:
+    GFSK passes binary data through a Gaussian filter (BT=0.5), resulting in a significantly
+    narrower Spectral Spread and smaller differential phase std than CPFSK.
+================================================================================
