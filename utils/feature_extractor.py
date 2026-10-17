@@ -7,10 +7,10 @@ Capstone Mini-Project - Topic 02: Spectral & Temporal Feature Engineering
 Module: utils/feature_extractor.py
 Description:
   Vectorized feature extraction module for complex baseband bursts z[n] = I[n] + jQ[n].
-  Computes:
-    1. Higher-Order Moments & Cumulants (2nd & 4th order: M20, M21, M40, M42, C40, C42).
-    2. Temporal & Differential Phase Statistics (delta_phi mean, std, kurtosis, amp stats).
-    3. Spectral Statistics from FFT (Power spectrum, Spectral Centroid, Spread, Entropy).
+  Complies 100% with Topic 02 specifications:
+    1. Higher-Order Moments & Cumulants (C20, C21, |C40|, C42, M20, M40, M42).
+    2. Temporal & Differential Phase Statistics (mu_dphi, sigma_dphi, Max FFT Phase Diff, envelope).
+    3. FFT Spectral Statistics (FFT Peak gamma_max, Centroid mu_f, Spread sigma_f, Entropy H_f).
 ================================================================================
 """
 
@@ -23,21 +23,21 @@ FEATURE_NAMES: List[str] = [
     'C40_real',             # Re(C40)
     'C40_imag',             # Im(C40)
     'C42',                  # C42
-    'M20_abs',              # |M20|
-    'M20_real',             # Re(M20)
-    'M20_imag',             # Im(M20)
+    'C20_abs',              # |C20|
+    'C20_real',             # Re(C20)
+    'C21',                  # C21 = M21 (energy = 1.0)
     'M40_abs',              # |M40|
     'M42',                  # M42
-    'phase_diff_mean',      # Mean of differential phase
-    'phase_diff_std',       # Std of differential phase
-    'phase_diff_kurtosis',  # Kurtosis of differential phase
+    'phase_diff_mean',      # Mean of differential phase (mu_dphi)
+    'phase_diff_std',       # Std of differential phase (sigma_dphi)
+    'phase_diff_fft_max',   # Max FFT Magnitude of differential phase
     'amp_mean',             # Mean instantaneous envelope
     'amp_std',              # Std instantaneous envelope
     'amp_kurtosis',         # Kurtosis of envelope
+    'gamma_max',            # Normalized FFT Power Spectrum Peak (gamma_max)
     'spectral_centroid',    # Spectral Centroid (mu_f)
     'spectral_spread',      # Spectral Spread (sigma_f)
     'spectral_entropy',     # Normalized Spectral Entropy (H_f)
-    'spectral_skewness',    # Spectral Skewness
     'spectral_kurtosis'     # Spectral Kurtosis
 ]
 
@@ -65,32 +65,36 @@ def extract_burst_features_1d(z: np.ndarray) -> np.ndarray:
     M42 = np.mean(np.abs(z)**4)
 
     # Cumulants
+    # C20 = M20, C21 = M21
     # C40 = M40 - 3 * M20^2
     C40 = M40 - 3.0 * (M20**2)
     # C42 = M42 - |M20|^2 - 2 * M21^2
     C42 = np.real(M42 - (np.abs(M20)**2) - 2.0 * (M21**2))
 
-    C40_abs = np.abs(C40)
-    C40_real = np.real(C40)
-    C40_imag = np.imag(C40)
+    C40_abs = float(np.abs(C40))
+    C40_real = float(np.real(C40))
+    C40_imag = float(np.imag(C40))
+    C42_val = float(C42)
 
-    M20_abs = np.abs(M20)
-    M20_real = np.real(M20)
-    M20_imag = np.imag(M20)
-    M40_abs = np.abs(M40)
-    M42_val = np.real(M42)
+    C20_abs = float(np.abs(M20))
+    C20_real = float(np.real(M20))
+    C21_val = float(np.real(M21))
+    M40_abs = float(np.abs(M40))
+    M42_val = float(np.real(M42))
 
     # -------------------------------------------------------------------------
     # 2. Temporal & Differential Phase Statistics
     # -------------------------------------------------------------------------
-    # Instantaneous phase unwrapped
     inst_phase = np.unwrap(np.angle(z))
-    # Differential phase: delta_phi[n] = unwrap(angle(z[n])) - unwrap(angle(z[n-1]))
     delta_phi = np.diff(inst_phase)
 
     dphi_mean = float(np.mean(delta_phi))
     dphi_std = float(np.std(delta_phi))
-    dphi_kurt = float(stats.kurtosis(delta_phi)) if len(delta_phi) > 3 else 0.0
+
+    # Max FFT Magnitude of Differential Phase
+    dphi_detrend = delta_phi - dphi_mean
+    dphi_fft = np.abs(np.fft.fft(dphi_detrend))**2
+    dphi_fft_max = float(np.max(dphi_fft) / (np.sum(dphi_fft) + eps))
 
     # Instantaneous envelope A[n] = |z[n]|
     amp = np.abs(z)
@@ -110,34 +114,35 @@ def extract_burst_features_1d(z: np.ndarray) -> np.ndarray:
 
     P_k = power_spectrum / total_power  # Normalized power distribution sum(P_k) = 1
 
+    # (a) FFT Power Spectrum Peak gamma_max
+    gamma_max = float(np.max(P_k))
+
     # Centered normalized frequency axis f_k in [-0.5, 0.5)
     f_k = np.fft.fftshift(np.fft.fftfreq(L, d=1.0))
 
-    # Spectral Centroid: mu_f = sum(f_k * P[k])
+    # (b) Spectral Centroid: mu_f = sum(f_k * P[k])
     mu_f = float(np.sum(f_k * P_k))
 
-    # Spectral Spread: sigma_f = sqrt(sum((f_k - mu_f)^2 * P[k]))
+    # (c) Spectral Spread: sigma_f = sqrt(sum((f_k - mu_f)^2 * P[k]))
     variance_f = float(np.sum(((f_k - mu_f)**2) * P_k))
-    sigma_f = np.sqrt(max(variance_f, 0.0))
+    sigma_f = float(np.sqrt(max(variance_f, 0.0)))
 
-    # Spectral Entropy: H_f = - sum(P[k] * log2(P[k] + eps)) / log2(L)
+    # (d) Spectral Entropy: H_f = - sum(P[k] * log2(P[k] + eps)) / log2(L)
     H_f = float(-np.sum(P_k * np.log2(P_k + eps)) / np.log2(L))
 
-    # Spectral Skewness and Kurtosis
+    # Spectral Kurtosis
     if sigma_f > 1e-6:
-        spec_skew = float(np.sum(((f_k - mu_f) / sigma_f)**3 * P_k))
         spec_kurt = float(np.sum(((f_k - mu_f) / sigma_f)**4 * P_k))
     else:
-        spec_skew = 0.0
         spec_kurt = 0.0
 
     features = np.array([
-        C40_abs, C40_real, C40_imag, C42,
-        M20_abs, M20_real, M20_imag, M40_abs, M42_val,
-        dphi_mean, dphi_std, dphi_kurt,
+        C40_abs, C40_real, C40_imag, C42_val,
+        C20_abs, C20_real, C21_val, M40_abs, M42_val,
+        dphi_mean, dphi_std, dphi_fft_max,
         amp_mean, amp_std, amp_kurt,
-        mu_f, sigma_f, H_f,
-        spec_skew, spec_kurt
+        gamma_max, mu_f, sigma_f, H_f,
+        spec_kurt
     ], dtype=np.float32)
 
     # Sanitize any NaNs or Infs

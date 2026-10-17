@@ -270,16 +270,21 @@ with vis_col2:
     # Vertical line for Spectral Centroid
     mu_f = feat_dict['spectral_centroid']
     sigma_f = feat_dict['spectral_spread']
+    gamma_max = feat_dict.get('gamma_max', float(np.max(P_norm)))
+    H_f = feat_dict.get('spectral_entropy', 0.0)
+
     ax2.axvline(mu_f, color='#DC2626', linestyle='--', linewidth=1.5, label=f'Centroid ({mu_f:+.3f})')
     # Shaded band for Spectral Spread
     ax2.axvspan(mu_f - sigma_f, mu_f + sigma_f, color='#38BDF8', alpha=0.25, label=f'Spread (±{sigma_f:.3f})')
+    # Horizontal line for Peak gamma_max
+    ax2.axhline(gamma_max, color='#8B5CF6', linestyle=':', linewidth=1.3, label=f'Peak γ_max ({gamma_max:.3f})')
 
     ax2.set_xlim([-0.5, 0.5])
-    ax2.set_ylim([0, max(np.max(P_norm) * 1.15, 0.05)])
+    ax2.set_ylim([0, max(np.max(P_norm) * 1.18, 0.05)])
     ax2.set_title("Computed FFT Power Spectrum", fontsize=10, fontweight='bold')
     ax2.set_xlabel("Normalized Frequency (f / fs)", fontsize=8, fontweight='bold')
     ax2.set_ylabel("Normalized Power P[k]", fontsize=8, fontweight='bold')
-    ax2.legend(loc='upper right', fontsize=7, frameon=True)
+    ax2.legend(loc='upper right', fontsize=6.8, frameon=True)
     ax2.grid(True, linestyle='--', alpha=0.4)
     st.pyplot(fig2, use_container_width=True)
     plt.close(fig2)
@@ -306,49 +311,61 @@ with vis_col3:
 # -----------------------------------------------------------------------------
 st.markdown("### 🔬 Extracted Physical Feature Values Panel")
 
-card1, card2, card3, card4, card5, card6 = st.columns(6)
-
-with card1:
+# Row 1: Cumulants & Differential Phase
+r1_c1, r1_c2, r1_c3, r1_c4 = st.columns(4)
+with r1_c1:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-title">|C40| (Cumulant)</div>
         <div class="metric-value">{feat_dict['C40_abs']:.3f}</div>
     </div>
     """, unsafe_allow_html=True)
-
-with card2:
+with r1_c2:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-title">C42 (Cumulant)</div>
         <div class="metric-value">{feat_dict['C42']:.3f}</div>
     </div>
     """, unsafe_allow_html=True)
-
-with card3:
+with r1_c3:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-title">Phase Diff Std (σ_Δϕ)</div>
         <div class="metric-value">{feat_dict['phase_diff_std']:.3f}</div>
     </div>
     """, unsafe_allow_html=True)
+with r1_c4:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-title">Max FFT Phase Diff</div>
+        <div class="metric-value">{feat_dict.get('phase_diff_fft_max', 0.0):.3f}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-with card4:
+# Row 2: Frequency-Domain (FFT) Spectral Statistics
+r2_c1, r2_c2, r2_c3, r2_c4 = st.columns(4)
+with r2_c1:
+    st.markdown(f"""
+    <div class="metric-card">
+        <div class="metric-title">FFT Peak (γ_max)</div>
+        <div class="metric-value">{feat_dict.get('gamma_max', float(np.max(P_norm))):.3f}</div>
+    </div>
+    """, unsafe_allow_html=True)
+with r2_c2:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-title">Spectral Centroid (μ_f)</div>
         <div class="metric-value">{feat_dict['spectral_centroid']:+.3f}</div>
     </div>
     """, unsafe_allow_html=True)
-
-with card5:
+with r2_c3:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-title">Spectral Spread (σ_f)</div>
         <div class="metric-value">{feat_dict['spectral_spread']:.3f}</div>
     </div>
     """, unsafe_allow_html=True)
-
-with card6:
+with r2_c4:
     st.markdown(f"""
     <div class="metric-card">
         <div class="metric-title">Spectral Entropy (H_f)</div>

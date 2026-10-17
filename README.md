@@ -22,8 +22,8 @@ This project delivers a complete, reproducible physical-layer engineering compar
 ### 1. Quick Environment Setup
 ```bash
 # Clone and enter repository
-git clone https://github.com/your-repo/amc_topic2_project.git
-cd amc_topic2_project
+git clone https://github.com/lshug180203/Spectral-Temporal-Feature-Engineering-vs-End-to-End-Raw-IQ-Deep-Learning.git
+cd "Spectral-Temporal-Feature-Engineering-vs-End-to-End-Raw-IQ-Deep-Learning"
 
 # Create virtual environment and install dependencies
 python -m venv .venv
