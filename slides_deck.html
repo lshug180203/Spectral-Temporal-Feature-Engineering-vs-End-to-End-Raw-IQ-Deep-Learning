@@ -237,6 +237,107 @@
       font-weight: 600;
       color: var(--text-muted);
     }
+  
+    /* Print header: hidden on screen, visible on print */
+    .slide-print-header {
+      display: none;
+    }
+
+    /* Print styling: exact 16:9 widescreen per slide page */
+    @media print {
+      @page {
+        size: 16in 9in;
+        margin: 0;
+      }
+      *, *::before, *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      html, body {
+        width: 16in !important;
+        height: auto !important;
+        background: #FFFFFF !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+      #deck-container {
+        width: 16in !important;
+        max-width: none !important;
+        height: auto !important;
+        max-height: none !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+      }
+      .slide-header, .slide-footer {
+        display: none !important;
+      }
+      .slide-body {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 16in !important;
+        height: 9in !important;
+        max-height: 9in !important;
+        box-sizing: border-box !important;
+        padding: 0.5in 0.75in !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        overflow: hidden !important;
+        position: relative !important;
+        background: #FFFFFF !important;
+      }
+      .slide-body:last-of-type {
+        page-break-after: auto !important;
+        break-after: auto !important;
+      }
+      .slide-print-header {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-bottom: 1.5px solid #E2E8F0 !important;
+        padding-bottom: 10px !important;
+        margin-bottom: 18px !important;
+      }
+      .slide-title {
+        font-size: 2.1rem !important;
+        margin-bottom: 6px !important;
+      }
+      .slide-subtitle {
+        font-size: 1.15rem !important;
+        margin-bottom: 18px !important;
+      }
+      .card {
+        padding: 16px 20px !important;
+        background: #F8FAFC !important;
+        border: 1px solid #CBD5E1 !important;
+      }
+      .card-title {
+        font-size: 1.15rem !important;
+        margin-bottom: 10px !important;
+      }
+      .card-content {
+        font-size: 0.98rem !important;
+        line-height: 1.55 !important;
+      }
+      .formula-box {
+        font-size: 0.95rem !important;
+        padding: 10px 14px !important;
+      }
+      table {
+        font-size: 0.92rem !important;
+      }
+      th, td {
+        padding: 9px 12px !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -253,6 +354,10 @@
 
   <!-- SLIDE 1 -->
   <div class="slide-body active" data-slide="1" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 1 / 14 • Thành viên 1 (Phút 00:00 - 04:30)</span>
+    </div>
     <h1 class="slide-title">Automatic Modulation Classification</h1>
     <p class="slide-subtitle">Domain-Expert Feature Engineering vs. End-to-End Raw I/Q Deep Learning</p>
     <div class="cards-grid grid-3">
@@ -291,6 +396,10 @@
 
   <!-- SLIDE 2 -->
   <div class="slide-body" data-slide="2" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 2 / 14 • Thành viên 1 (Phút 00:00 - 04:30)</span>
+    </div>
     <h1 class="slide-title">Mô hình Tín hiệu Baseband & Chuẩn hóa RMS</h1>
     <p class="slide-subtitle">Tuân thủ nghiêm ngặt mô hình lớp vật lý vô tuyến (Baseband Physics)</p>
     <div class="cards-grid grid-2">
@@ -325,6 +434,10 @@
 
   <!-- SLIDE 3 -->
   <div class="slide-body" data-slide="3" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 3 / 14 • Thành viên 1 (Phút 00:00 - 04:30)</span>
+    </div>
     <h1 class="slide-title">Lý thuyết Toán học Higher-Order Cumulants (HOC)</h1>
     <p class="slide-subtitle">Tính bất biến và khả năng phân tách hình học chòm sao (Constellation Geometry)</p>
     <div class="cards-grid grid-1-2">
@@ -364,6 +477,10 @@
 
   <!-- SLIDE 4 -->
   <div class="slide-body" data-slide="4" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 4 / 14 • Thành viên 1 (Phút 00:00 - 04:30)</span>
+    </div>
     <h1 class="slide-title">Không gian Đặc trưng Chuyên gia 10 Chiều (10-D)</h1>
     <p class="slide-subtitle">Kết hợp thống kê bậc cao, pha vi sai và đặc trưng phổ FFT</p>
     <div class="cards-grid grid-3">
@@ -402,6 +519,10 @@
 
   <!-- SLIDE 5 -->
   <div class="slide-body" data-slide="5" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 5 / 14 • Thành viên 2 (Phút 04:30 - 09:30)</span>
+    </div>
     <h1 class="slide-title">Quy trình Chống Rò rỉ Dữ liệu (Zero-Leakage)</h1>
     <p class="slide-subtitle">Phân bổ độc lập hoàn toàn giữa Train, Validation và Test</p>
     <div class="cards-grid grid-3">
@@ -440,6 +561,10 @@
 
   <!-- SLIDE 6 -->
   <div class="slide-body" data-slide="6" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 6 / 14 • Thành viên 2 (Phút 04:30 - 09:30)</span>
+    </div>
     <h1 class="slide-title">Mô hình Phân loại Đặc trưng: XGBoost & RBF-SVM</h1>
     <p class="slide-subtitle">Khai thác tối đa không gian 10-D bằng thuật toán học máy cổ điển tối ưu</p>
     <div class="cards-grid grid-2">
@@ -470,6 +595,10 @@
 
   <!-- SLIDE 7 -->
   <div class="slide-body" data-slide="7" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 7 / 14 • Thành viên 2 (Phút 04:30 - 09:30)</span>
+    </div>
     <h1 class="slide-title">Kiến trúc Mạng End-to-End PyTorch 1D-CNN</h1>
     <p class="slide-subtitle">Học biểu diễn trực tiếp từ mảng Raw I/Q [N, 2, 128] không qua xử lý thủ công</p>
     <div class="cards-grid grid-2">
@@ -501,6 +630,10 @@
 
   <!-- SLIDE 8 -->
   <div class="slide-body" data-slide="8" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 8 / 14 • Thành viên 2 (Phút 04:30 - 09:30)</span>
+    </div>
     <h1 class="slide-title">Độ phức tạp Tính toán & Khả năng Triển khai Nhúng</h1>
     <p class="slide-subtitle">So sánh thực nghiệm chi phí suy luận và bộ nhớ trên phần cứng thực</p>
     <div class="cards-grid grid-1-2">
@@ -535,6 +668,10 @@
 
   <!-- SLIDE 9 -->
   <div class="slide-body" data-slide="9" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 9 / 14 • Thành viên 3 (Phút 09:30 - 15:00)</span>
+    </div>
     <h1 class="slide-title">Kết quả Thực nghiệm: SNR Curves & Macro-F1</h1>
     <p class="slide-subtitle">Đánh giá trên tập held-out độc lập (n = 7,200 test bursts)</p>
     <div class="cards-grid grid-3">
@@ -577,6 +714,10 @@
 
   <!-- SLIDE 10 -->
   <div class="slide-body" data-slide="10" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 10 / 14 • Thành viên 3 (Phút 09:30 - 15:00)</span>
+    </div>
     <h1 class="slide-title">Phân tích Ma trận Nhầm lẫn (Confusion Matrix)</h1>
     <p class="slide-subtitle">Hành vi phân loại thay đổi rõ rệt qua 3 chế độ nhiễu</p>
     <div class="cards-grid grid-3">
@@ -612,6 +753,10 @@
 
   <!-- SLIDE 11 -->
   <div class="slide-body" data-slide="11" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 11 / 14 • Thành viên 3 (Phút 09:30 - 15:00)</span>
+    </div>
     <h1 class="slide-title">Lỗi Gốc rễ 1: Sự Suy sụp của Cumulants ở SNR Thấp</h1>
     <p class="slide-subtitle">Chứng minh định lượng bằng toán học xác suất & lý thuyết tín hiệu</p>
     <div class="cards-grid grid-2">
@@ -651,6 +796,10 @@
 
   <!-- SLIDE 12 -->
   <div class="slide-body" data-slide="12" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 12 / 14 • Thành viên 3 (Phút 09:30 - 15:00)</span>
+    </div>
     <h1 class="slide-title">Lỗi Gốc rễ 2: Tại sao 1D-CNN Vượt trội ở SNR Thấp?</h1>
     <p class="slide-subtitle">Bản chất của tích chập thời gian: Bộ lọc phối hợp ngầm định (Implicit Matched Filter)</p>
     <div class="cards-grid grid-2">
@@ -682,6 +831,10 @@
 
   <!-- SLIDE 13 -->
   <div class="slide-body" data-slide="13" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 13 / 14 • Thành viên 3 (Phút 09:30 - 15:00)</span>
+    </div>
     <h1 class="slide-title">Lỗi Gốc rễ 3: Điểm nghẽn 16QAM vs 64QAM</h1>
     <p class="slide-subtitle">Sự trùng lặp hình học khi độ dài khung quan sát quá ngắn (L = 128)</p>
     <div class="cards-grid grid-2">
@@ -718,6 +871,10 @@
 
   <!-- SLIDE 14 -->
   <div class="slide-body" data-slide="14" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <div class="slide-print-header">
+      <span class="topic-tag">EE136IU • TOPIC 02: AMC DEFENSE</span>
+      <span class="speaker-tag"><span class="speaker-dot"></span>Slide 14 / 14 • Thành viên 3 (Phút 09:30 - 15:00)</span>
+    </div>
     <h1 class="slide-title">Kết luận & Trình diễn Live Interactive Demo</h1>
     <p class="slide-subtitle">Tổng kết dự án và trực quan hóa thời gian thực trên Streamlit</p>
     <div class="cards-grid grid-2">
@@ -753,6 +910,7 @@
   <div class="slide-footer">
     <button class="nav-btn" id="prev-btn" onclick="prevSlide()">◀ Trang trước (Phím ←)</button>
     <div class="slide-counter" id="counter">Slide 1 / 14</div>
+    <button class="nav-btn" id="export-pdf-btn" onclick="window.print()" style="background:#0284C7; color:#FFFFFF; border-color:#0284C7;">🖨️ Xuất PDF / In Slide</button>
     <button class="nav-btn" id="next-btn" onclick="nextSlide()">Trang sau (Phím →) ▶</button>
   </div>
 </div>
