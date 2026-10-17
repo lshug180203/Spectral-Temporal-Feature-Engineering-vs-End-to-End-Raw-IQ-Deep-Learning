@@ -1,6 +1,11 @@
-﻿__pycache__/
+__pycache__/
 *.pyc
 .venv/
 data/
 .streamlit/
 .DS_Store
+
+# Slide presentation artifacts excluded from repo
+slides_deck.html
+Topic02_AMC_Presentation_Slides.pdf
+PRESENTATION_SLIDES_TOPIC2.md
