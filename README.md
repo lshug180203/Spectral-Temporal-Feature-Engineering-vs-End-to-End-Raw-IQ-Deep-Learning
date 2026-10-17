@@ -8,7 +8,7 @@
 
 ---
 
-## 📌 Executive Summary & Project Objective
+## Executive Summary & Project Objective
 
 In modern cognitive radio (CR) and electronic surveillance systems, **Automatic Modulation Classification (AMC)** enables autonomous spectrum monitoring, adaptive waveform demodulation, and interference triage without dedicated pilot overhead.
 
@@ -18,7 +18,7 @@ This project delivers a complete, reproducible physical-layer engineering compar
 
 ---
 
-## ⚡ 1-Command Reproduction (< 30 Seconds)
+## 1-Command Reproduction (< 30 Seconds)
 
 ### 1. Quick Environment Setup
 ```bash
@@ -47,7 +47,7 @@ streamlit run demo/app.py
 
 ---
 
-## 🏗️ Repository Architecture
+## Repository Architecture
 
 ```text
 amc_topic2_project/
@@ -116,7 +116,7 @@ From normalized centered power spectrum $P[k] = \frac{|FFT(z[n])|^2}{\sum |FFT(z
 
 ---
 
-## 🔬 Deep Physical Root-Cause Failure Analysis
+##  Deep Physical Root-Cause Failure Analysis
 
 ### Why Cumulants Fail at Low SNR ($\le -2$ dB)
 - Even though the theoretical 4th cumulant of Gaussian noise is zero asymptotically ($C_{40}(w) = 0$), sample estimators over finite length $L = 128$ suffer from variance scaling with noise power:
@@ -131,7 +131,7 @@ From normalized centered power spectrum $P[k] = \frac{|FFT(z[n])|^2}{\sum |FFT(z
 
 ---
 
-## 📊 Calibrated Evaluation Grid (-10 dB to +18 dB)
+## Calibrated Evaluation Grid (-10 dB to +18 dB)
 
 The models are rigorously benchmarked across 15 uniform SNR levels:
 `-10, -8, -6, -4, -2, 0, 2, 4, 6, 8, 10, 12, 14, 16, 18 dB`
@@ -145,13 +145,3 @@ Key output figures generated in `results/`:
 3. `results/failure_analysis_report.txt`: Automated numerical diagnostic report.
 
 ---
-
-## 🛡️ Pre-Defense Protocol Checklist (30 Minutes)
-
-| Phase | Duration | Focus |
-|---|---|---|
-| **Technical Presentation** | **15 Min (Strict)** | Problem framing, baseband equations, feature derivations, SNR curves, failure analysis |
-| **Interactive Live Demo** | **10 Min** | Streamlit UI manipulation, SNR slider (-4 dB stress test), CFO/jitter injection, inference latency |
-| **Faculty & Peer Q&A** | **5 Min** | Theoretical defense of cumulants, CNN filter mechanics, finite-sample limits |
-
-*(Strict overtime penalty enforced: > 15 minutes incurs deduction per course rubric).*
