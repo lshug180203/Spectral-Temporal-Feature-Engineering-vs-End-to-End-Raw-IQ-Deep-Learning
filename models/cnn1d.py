@@ -218,6 +218,23 @@ class CNN1DPipeline:
 
         return avg_loss, acc, f1, all_preds, all_probs
 
+    def predict_batch(self, iq_batch: np.ndarray, batch_size: int = 1024) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Batched inference on raw I/Q tensors [N, 2, 128].
+
+        Returns:
+            preds: integer class indices, shape [N]
+            probs: softmax probabilities, shape [N, num_classes]
+        """
+        self.model.eval()
+        all_probs = []
+        with torch.no_grad():
+            for start in range(0, len(iq_batch), batch_size):
+                chunk = torch.from_numpy(iq_batch[start:start + batch_size]).float().to(self.device)
+                all_probs.append(torch.softmax(self.model(chunk), dim=1).cpu().numpy())
+        probs = np.concatenate(all_probs, axis=0)
+        return np.argmax(probs, axis=1), probs
+
     def predict_single_burst(self, iq_burst: np.ndarray) -> Tuple[int, np.ndarray, float]:
         """
         Runs single-burst inference on raw I/Q array [2, 128] and measures latency in ms.

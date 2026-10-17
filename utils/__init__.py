@@ -7,6 +7,7 @@ from .feature_extractor import (
 from .metrics_plots import (
     evaluate_models_per_snr,
     plot_snr_curves,
+    plot_training_curves,
     plot_confusion_matrices_at_regimes,
     print_failure_analysis_report
 )
@@ -18,6 +19,7 @@ __all__ = [
     'get_feature_dict',
     'evaluate_models_per_snr',
     'plot_snr_curves',
+    'plot_training_curves',
     'plot_confusion_matrices_at_regimes',
     'print_failure_analysis_report'
 ]

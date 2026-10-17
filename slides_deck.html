@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 02 - AMC Defense Presentation Deck (15 Mins)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #FFFFFF;
+      --card-bg: #F8FAFC;
+      --card-border: #E2E8F0;
+      --text-main: #0F172A;
+      --text-muted: #64748B;
+      --accent: #0284C7;
+      --accent-light: #E0F2FE;
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background-color: #F1F5F9;
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Presentation Screen Container */
+    #deck-container {
+      width: 95vw;
+      max-width: 1350px;
+      height: 88vh;
+      max-height: 820px;
+      background: var(--bg-main);
+      border-radius: 16px;
+      box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.12);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+    }
+
+    /* Header Bar */
+    .slide-header {
+      padding: 18px 36px;
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FFFFFF;
+    }
+    .topic-tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    .speaker-tag {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .speaker-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* Slide Content Area */
+    .slide-body {
+      flex: 1;
+      padding: 32px 42px;
+      overflow-y: auto;
+      display: none;
+    }
+    .slide-body.active {
+      display: flex;
+      flex-direction: column;
+      animation: fadeIn 0.3s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+    .slide-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      gap: 20px;
+      flex: 1;
+    }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .grid-1-2 { grid-template-columns: 1.2fr 1.8fr; }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-content {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: #334155;
+    }
+    .card-content ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    .card-content li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 8px;
+    }
+    .card-content li::before {
+      content: "•";
+      color: var(--accent);
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+      font-size: 1.2rem;
+      line-height: 1.4rem;
+    }
+
+    /* Code & Formulas */
+    .formula-box {
+      background: #FFFFFF;
+      border: 1px dashed #CBD5E1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      margin: 10px 0;
+      color: #0369A1;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 4px;
+    }
+    .badge-success { background: #DCFCE7; color: #15803D; }
+    .badge-danger { background: #FEE2E2; color: #B91C1C; }
+    .badge-info { background: #E0F2FE; color: #0369A1; }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      margin-top: 8px;
+    }
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+    th {
+      background: #EDF2F7;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    tr:hover { background: rgba(2, 132, 199, 0.04); }
+
+    /* Footer Nav */
+    .slide-footer {
+      padding: 14px 36px;
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #FFFFFF;
+    }
+    .nav-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      color: var(--text-main);
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: var(--accent);
+      color: #FFFFFF;
+      border-color: var(--accent);
+    }
+    .slide-counter {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<div id="deck-container">
+  <!-- Top Bar -->
+  <div class="slide-header">
+    <span class="topic-tag">EE136IU • Topic 02: AMC Defense</span>
+    <span class="speaker-tag" id="speaker-indicator">
+      <span class="speaker-dot"></span>
+      <span id="speaker-name">Member 1 (00:00 - 04:30)</span>
+    </span>
+  </div>
+
+  <!-- SLIDE 1 -->
+  <div class="slide-body active" data-slide="1" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <h1 class="slide-title">Automatic Modulation Classification</h1>
+    <p class="slide-subtitle">Domain-Expert Feature Engineering vs. End-to-End Raw I/Q Deep Learning</p>
+    <div class="cards-grid grid-3">
+      <div class="card">
+        <div class="card-title">📌 Bối cảnh Kỹ thuật</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Cognitive Radio & 5G/6G:</strong> AMC là module tiên quyết giúp máy thu vô tuyến tự thích ứng với các dạng điều chế linh hoạt.</li>
+            <li><strong>Bài toán phân loại mù:</strong> Tự động nhận diện 8 chuẩn điều chế không cần tín hiệu hoa tiêu (Pilot/Preamble).</li>
+            <li><strong>Thách thức thực tế:</strong> Nhiễu kênh nặng (AWGN), suy hao đa đường, và độ lệch pha/tần số sóng mang (CFO).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Câu hỏi Nghiên cứu Cốt lõi</div>
+        <div class="card-content">
+          <ul>
+            <li>Đặc trưng vật lý chuyên gia (Cumulants, Pha vi sai, Phổ FFT) có còn cạnh tranh với Deep Learning?</li>
+            <li>Mô hình nào chiếm ưu thế tuyệt đối ở vùng nhiễu nặng (SNR &lt; 0 dB)?</li>
+            <li>Đánh đổi thực tế giữa độ chính xác, độ trễ suy luận (latency) và tài nguyên tính toán trên thiết bị nhúng.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚡ Đóng góp Kỹ thuật</div>
+        <div class="card-content">
+          <ul>
+            <li>Bộ phát sinh kênh Baseband chân thực (RRC filter, AWGN, CFO ngẫu nhiên).</li>
+            <li>Phân chia dataset chống rò rỉ (Zero-Leakage 70/15/15 độc lập seed).</li>
+            <li>Phân tích lỗi gốc rễ định lượng: Sự suy sụp của Cumulants ở SNR thấp và điểm nghẽn 16QAM vs 64QAM.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2 -->
+  <div class="slide-body" data-slide="2" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <h1 class="slide-title">Mô hình Tín hiệu Baseband & Chuẩn hóa RMS</h1>
+    <p class="slide-subtitle">Tuân thủ nghiêm ngặt mô hình lớp vật lý vô tuyến (Baseband Physics)</p>
+    <div class="cards-grid grid-2">
+      <div class="card">
+        <div class="card-title">📡 Chuỗi Xử lý Phát - Kênh - Thu</div>
+        <div class="card-content">
+          <div class="formula-box">
+            r[n] = (∑ s[k] · g(nT_s - kT)) · e^(j(2πΔf_c n T_s + θ_0)) + w[n]
+          </div>
+          <ul>
+            <li><strong>Tạo dạng xung RRC:</strong> Root Raised Cosine với hệ số roll-off α = 0.35, SPS = 4 mẫu/symbol, span = 8 symbols.</li>
+            <li><strong>Độ lệch tần số & pha (CFO & Phase Jitter):</strong> Mô phỏng sai số thạch anh giữa máy phát và máy thu vô tuyến.</li>
+            <li><strong>Nhiễu AWGN:</strong> Nhiễu trắng Gauss phức w[n] ~ CN(0, σ_w²), quét từ -10 dB đến +18 dB (bước 2 dB).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚖️ Chuẩn hóa Năng lượng Per-Burst RMS</div>
+        <div class="card-content">
+          <div class="formula-box">
+            r̃[n] = r[n] / √( (1/L) ∑ |r[m]|² ),  với L = 128 mẫu
+          </div>
+          <ul>
+            <li><strong>Triệt tiêu thiên vị biên độ (Path Loss Invariance):</strong> Loại bỏ ảnh hưởng của khoảng cách truyền dẫn đến công suất thu.</li>
+            <li><strong>Ép mô hình học hình học thực:</strong> Bộ phân loại buộc phải dựa trên phân bố chòm sao và pha thay vì biên độ thô.</li>
+            <li><strong>Lưu ý kỹ thuật:</strong> Chuẩn hóa RMS thay vì Peak để tránh khuếch đại nhiễu tức thời ở SNR âm.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3 -->
+  <div class="slide-body" data-slide="3" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <h1 class="slide-title">Lý thuyết Toán học Higher-Order Cumulants (HOC)</h1>
+    <p class="slide-subtitle">Tính bất biến và khả năng phân tách hình học chòm sao (Constellation Geometry)</p>
+    <div class="cards-grid grid-1-2">
+      <div class="card">
+        <div class="card-title">📐 Định nghĩa & Tính chất</div>
+        <div class="card-content">
+          <div class="formula-box">
+            C40 = M40 - 3(M20)²<br>
+            C42 = M42 - |M20|² - 2(M21)²
+          </div>
+          <ul>
+            <li><strong>Cumulants của Gaussian:</strong> C_pq(w) = 0 với p+q ≥ 3. Về mặt lý thuyết, HOC triệt tiêu hoàn toàn nhiễu trắng!</li>
+            <li><strong>Bất biến quay (Rotational Invariance):</strong> C42 không phụ thuộc vào pha ngẫu nhiên θ_0 của sóng mang.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Bảng Giá trị Lý thuyết Tuyệt đối (Không nhiễu, Es = 1)</div>
+        <div class="card-content">
+          <table>
+            <thead>
+              <tr><th>Điều chế</th><th>Đối xứng</th><th>|C40|</th><th>C42</th><th>Đặc trưng Chòm sao</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>BPSK</strong></td><td>180°</td><td><strong>2.000</strong></td><td><strong>-2.000</strong></td><td>1D thẳng, s² = 1</td></tr>
+              <tr><td><strong>QPSK</strong></td><td>90°</td><td><strong>1.000</strong></td><td><strong>-1.000</strong></td><td>4 điểm tròn, s⁴ = -1</td></tr>
+              <tr><td><strong>8PSK</strong></td><td>45°</td><td><strong>0.000</strong></td><td><strong>-1.000</strong></td><td>8 điểm tròn, s⁴ = 0</td></tr>
+              <tr><td><strong>16QAM</strong></td><td>90°</td><td><strong>0.680</strong></td><td><strong>-0.680</strong></td><td>3 mức năng lượng, đa biên độ</td></tr>
+              <tr><td><strong>64QAM</strong></td><td>90°</td><td><strong>0.619</strong></td><td><strong>-0.619</strong></td><td>9 mức năng lượng (rất sát 16QAM)</td></tr>
+              <tr><td><strong>PAM4</strong></td><td>180°</td><td><strong>1.360</strong></td><td><strong>-1.360</strong></td><td>1D 4 mức biên độ thực</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4 -->
+  <div class="slide-body" data-slide="4" data-speaker="Thành viên 1 (Phút 00:00 - 04:30)">
+    <h1 class="slide-title">Không gian Đặc trưng Chuyên gia 10 Chiều (10-D)</h1>
+    <p class="slide-subtitle">Kết hợp thống kê bậc cao, pha vi sai và đặc trưng phổ FFT</p>
+    <div class="cards-grid grid-3">
+      <div class="card">
+        <div class="card-title">📈 4 Đặc trưng Cumulants</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>C20, C21:</strong> Moment bậc 2, nhận biết tính chất phức/thực của tín hiệu.</li>
+            <li><strong>|C40|:</strong> Tách biệt BPSK (|C40|=2) vs QPSK (|C40|=1) vs 8PSK (|C40|=0).</li>
+            <li><strong>C42:</strong> Tách biệt tín hiệu bao không đổi (PSK: C42=-1) vs điều chế biên độ (QAM: C42 ≈ -0.65).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔄 3 Đặc trưng Pha Vi sai</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Δϕ[n] = unwrap(arg(r[n] · r*[n-1])):</strong> Loại bỏ độ lệch pha tĩnh θ_0.</li>
+            <li><strong>μ_Δϕ, σ_Δϕ:</strong> Độ lệch chuẩn pha phân biệt pha chuyển tiếp ngẫu nhiên vs pha liên tục.</li>
+            <li><strong>Max FFT Pha vi sai:</strong> Bắt tần số sóng mang của điều chế tần số (CPFSK, GFSK).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚡ 3 Đặc trưng Phổ FFT</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>γ_max:</strong> Tỷ số đỉnh phổ cực đại chuẩn hóa theo công suất khung.</li>
+            <li><strong>Spectral Spread (σ_f):</strong> Độ rộng băng thông phân bố năng lượng quanh f_c.</li>
+            <li><strong>Spectral Flatness:</strong> Nhận diện tín hiệu trải phổ rộng vs tín hiệu tập trung phổ.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5 -->
+  <div class="slide-body" data-slide="5" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <h1 class="slide-title">Quy trình Chống Rò rỉ Dữ liệu (Zero-Leakage)</h1>
+    <p class="slide-subtitle">Phân bổ độc lập hoàn toàn giữa Train, Validation và Test</p>
+    <div class="cards-grid grid-3">
+      <div class="card">
+        <div class="card-title">📦 Quy mô Tập Dữ liệu</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Tổng số burst:</strong> 48,000 bursts (8 classes × 15 SNRs × 400 bursts).</li>
+            <li><strong>Train Set (70%):</strong> 33,600 bursts (seed = 42).</li>
+            <li><strong>Val Set (15%):</strong> 7,200 bursts (seed = 43).</li>
+            <li><strong>Test Set (15%):</strong> 7,200 bursts (seed = 44).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔒 Nguyên tắc Chống Rò rỉ</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Độc lập chuỗi ngẫu nhiên:</strong> Test set sinh từ chuỗi bit và kênh hoàn toàn mới, không trích xuất lát cắt.</li>
+            <li><strong>Chuẩn hóa không rò rỉ:</strong> `StandardScaler` chỉ `fit` trên tập Train; chỉ áp dụng `transform` trên Val/Test.</li>
+            <li><strong>Khóa ngẫu nhiên tuyệt đối:</strong> Đảm bảo 100% tính tái lập (Reproducibility).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Đánh giá Phân tầng (Stratified)</div>
+        <div class="card-content">
+          <ul>
+            <li>Mỗi điểm SNR trên đồ thị được đánh giá độc lập trên <strong>480 test bursts</strong> (60 bursts/class).</li>
+            <li>Tính toán Khoảng tin cậy Wilson 95% (Wilson CI) để kiểm định ý nghĩa thống kê của chênh lệch accuracy.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6 -->
+  <div class="slide-body" data-slide="6" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <h1 class="slide-title">Mô hình Phân loại Đặc trưng: XGBoost & RBF-SVM</h1>
+    <p class="slide-subtitle">Khai thác tối đa không gian 10-D bằng thuật toán học máy cổ điển tối ưu</p>
+    <div class="cards-grid grid-2">
+      <div class="card">
+        <div class="card-title">🌲 XGBoost Classifier</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Cấu hình siêu tham số:</strong> `n_estimators = 200`, `max_depth = 6`, `learning_rate = 0.1`, `subsample = 0.8`.</li>
+            <li><strong>Đặc tính:</strong> Rất mạnh trong phân vùng ranh giới phi tuyến; huấn luyện cực nhanh (4.2 giây cho 33,600 mẫu).</li>
+            <li><strong>Tầm quan trọng đặc trưng (Feature Importance):</strong>
+              <div class="formula-box">Top 1: |C40| &gt; Top 2: C42 &gt; Top 3: σ_Δϕ &gt; Top 4: γ_max</div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 RBF Support Vector Machine</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Cấu hình siêu tham số:</strong> Kernel RBF, `C = 10.0`, `gamma = 'scale'`, `probability = True` (Platt scaling).</li>
+            <li><strong>Tối ưu hóa thời gian huấn luyện:</strong> Giới hạn tập train của SVM ở 12,000 bursts có gieo mầm ngẫu nhiên để tránh độ phức tạp O(N²).</li>
+            <li><strong>Hiệu năng:</strong> Đạt Val Accuracy 62.75% trên toàn dải SNR (ảnh hưởng nặng bởi SNR âm).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7 -->
+  <div class="slide-body" data-slide="7" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <h1 class="slide-title">Kiến trúc Mạng End-to-End PyTorch 1D-CNN</h1>
+    <p class="slide-subtitle">Học biểu diễn trực tiếp từ mảng Raw I/Q [N, 2, 128] không qua xử lý thủ công</p>
+    <div class="cards-grid grid-2">
+      <div class="card">
+        <div class="card-title">🧠 Sơ đồ Khối Mạng Tích chập 1D</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Input:</strong> Tensor [Batch, 2, 128] (Kênh 0: In-phase I, Kênh 1: Quadrature Q).</li>
+            <li><strong>Block 1:</strong> Conv1d(2→64, k=7, p=3) → BatchNorm1d → ReLU → MaxPool1d(2).</li>
+            <li><strong>Block 2:</strong> Conv1d(64→128, k=5, p=2) → BatchNorm1d → ReLU → MaxPool1d(2).</li>
+            <li><strong>Block 3:</strong> Conv1d(128→256, k=3, p=1) → BatchNorm1d → ReLU → MaxPool1d(2).</li>
+            <li><strong>Phân loại:</strong> Flatten (4096) → Dense(256) → ReLU → Dropout(0.5) → Dense(8).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚙️ Chiến lược Huấn luyện & Regularization</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Số lượng tham số:</strong> 1,178,632 weights (~4.7 MB checkpoint).</li>
+            <li><strong>Optimizer:</strong> `AdamW` (lr = 1e-3, weight_decay = 1e-4).</li>
+            <li><strong>Adaptive Scheduler:</strong> `ReduceLROnPlateau` tự động giảm learning rate khi Val Loss chững lại.</li>
+            <li><strong>Early Stopping:</strong> Giám sát chặt chẽ Val Loss (patience = 7) để ngăn chặn hoàn toàn Overfitting.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8 -->
+  <div class="slide-body" data-slide="8" data-speaker="Thành viên 2 (Phút 04:30 - 09:30)">
+    <h1 class="slide-title">Độ phức tạp Tính toán & Khả năng Triển khai Nhúng</h1>
+    <p class="slide-subtitle">So sánh thực nghiệm chi phí suy luận và bộ nhớ trên phần cứng thực</p>
+    <div class="cards-grid grid-1-2">
+      <div class="card">
+        <div class="card-title">📋 Bảng Benchmark Độ trễ & Bộ nhớ</div>
+        <div class="card-content">
+          <table>
+            <thead>
+              <tr><th>Chỉ số</th><th>XGBoost</th><th>RBF-SVM</th><th>1D-CNN</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Kích thước File</strong></td><td><span class="badge badge-success">0.8 MB</span></td><td>8.4 MB</td><td>4.7 MB</td></tr>
+              <tr><td><strong>Thời gian trích đặc trưng</strong></td><td>0.85 ms</td><td>0.85 ms</td><td><span class="badge badge-success">0.00 ms</span></td></tr>
+              <tr><td><strong>Thời gian model suy luận</strong></td><td><span class="badge badge-success">0.08 ms</span></td><td>1.15 ms</td><td>0.42 ms</td></tr>
+              <tr><td><strong>Tổng độ trễ / Burst</strong></td><td>0.93 ms</td><td>2.00 ms</td><td><span class="badge badge-success">0.42 ms</span></td></tr>
+              <tr><td><strong>Throughput (burst/s)</strong></td><td>1,075</td><td>500</td><td><span class="badge badge-success">2,380</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💡 Phân tích Kỹ thuật Lựa chọn Phần cứng</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Edge IoT Cực hạn (MCU không GPU):</strong> Feature + XGBoost vượt trội vì mô hình cây chỉ thực hiện so sánh số thực `if-else`, không cần thư viện đại số tuyến tính nặng.</li>
+            <li><strong>SDR & Gateway (DSP / Edge GPU):</strong> 1D-CNN đạt throughput cao hơn gấp đôi (2,380 burst/s) nhờ xử lý song song tensor và loại bỏ nút thắt vòng lặp trích xuất FFT/Cumulant.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9 -->
+  <div class="slide-body" data-slide="9" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <h1 class="slide-title">Kết quả Thực nghiệm: SNR Curves & Macro-F1</h1>
+    <p class="slide-subtitle">Đánh giá trên tập held-out độc lập (n = 7,200 test bursts)</p>
+    <div class="cards-grid grid-3">
+      <div class="card">
+        <div class="card-title">📉 Vùng Nhiễu Nặng (-10 dB đến 0 dB)</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Tại -4 dB:</strong>
+              <div class="formula-box">
+                1D-CNN: <strong>48.75%</strong><br>
+                XGBoost: <strong>31.67%</strong><br>
+                Chênh lệch: <span class="badge badge-success">+17.08% cho CNN</span>
+              </div>
+            </li>
+            <li><strong>Tại 0 dB:</strong> 1D-CNN đạt 74.58%, trong khi XGBoost chỉ đạt 46.67% (+27.91%).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 Vùng Nhiễu Thấp (+6 dB đến +18 dB)</div>
+        <div class="card-content">
+          <ul>
+            <li>Cả 3 mô hình đều bứt phá mạnh mẽ vượt ngưỡng 85% từ +6 dB.</li>
+            <li>Tại SNR ≥ +12 dB: Cả XGBoost và 1D-CNN cùng hội tụ ở mức <strong>90% - 93%</strong>.</li>
+            <li>Giới hạn này tiệm cận trần lý thuyết của khung ngắn L = 128.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚖️ Chỉ số Macro-F1 Score</div>
+        <div class="card-content">
+          <ul>
+            <li>Đường cong Macro-F1 bám sát tuyệt đối đường Accuracy qua mọi mức SNR.</li>
+            <li>Chứng minh mô hình dự đoán đồng đều trên cả 8 class, không có hiện tượng class starvation (bỏ quên class khó).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10 -->
+  <div class="slide-body" data-slide="10" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <h1 class="slide-title">Phân tích Ma trận Nhầm lẫn (Confusion Matrix)</h1>
+    <p class="slide-subtitle">Hành vi phân loại thay đổi rõ rệt qua 3 chế độ nhiễu</p>
+    <div class="cards-grid grid-3">
+      <div class="card">
+        <div class="card-title">🔴 Nhiễu Nặng (-4 dB)</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>XGBoost:</strong> Ma trận nhầm lẫn bị phân tán mạnh; nhầm lẫn diện rộng giữa QPSK, 16QAM, 64QAM do Cumulant co cụm.</li>
+            <li><strong>1D-CNN:</strong> Duy trì độ chính xác cao trên BPSK (88%) và PAM4 (82%), nhận diện được một phần FSK.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🟡 Trung bình (+4 dB)</div>
+        <div class="card-content">
+          <ul>
+            <li>BPSK, PAM4, CPFSK, GFSK đạt độ chính xác gần như hoàn hảo (&gt; 95%).</li>
+            <li>Nhầm lẫn chỉ còn khu trú trong nội bộ các điều chế pha/biên độ: QPSK ↔ 8PSK ↔ 16QAM.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🟢 Không Nhiễu (+14 dB)</div>
+        <div class="card-content">
+          <ul>
+            <li>6 trên 8 điều chế đạt <strong>100%</strong> phân loại hoàn hảo.</li>
+            <li><strong>Điểm nghẽn duy nhất:</strong> Sự nhầm lẫn đối xứng giữa <strong>16QAM và 64QAM</strong> (khoảng 34% nhầm lẫn chéo).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 11 -->
+  <div class="slide-body" data-slide="11" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <h1 class="slide-title">Lỗi Gốc rễ 1: Sự Suy sụp của Cumulants ở SNR Thấp</h1>
+    <p class="slide-subtitle">Chứng minh định lượng bằng toán học xác suất & lý thuyết tín hiệu</p>
+    <div class="cards-grid grid-2">
+      <div class="card">
+        <div class="card-title">📉 Cơ chế A: Hệ số Co rút (Contraction Factor)</div>
+        <div class="card-content">
+          <p>Tín hiệu thu sau chuẩn hóa năng lượng per-burst RMS:</p>
+          <div class="formula-box">
+            C42_observed = C42_signal · ( ρ / (1 + ρ) )²
+          </div>
+          <ul>
+            <li>Tại SNR = -4 dB, tỷ số tuyến tính ρ = 10^(-0.4) ≈ 0.398.</li>
+            <li>Hệ số co rút: (0.398 / 1.398)² ≈ <strong>0.081</strong>.</li>
+            <li>Kỳ vọng Cumulant bị co rút tới <strong>92% về 0</strong>, ép sát cụm đặc trưng của mọi chòm sao lại với nhau.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💥 Cơ chế B: Bùng nổ Phương sai & Feature SNR</div>
+        <div class="card-content">
+          <p>Ước lượng mẫu M̂42 trung bình trên L = 128 mẫu:</p>
+          <ul>
+            <li>Phương sai Var{Ĉ42} bị thống trị bởi moment bậc 8 của nhiễu Gauss: E[|w|⁸].</li>
+            <li><strong>Độ lệch chuẩn σ_C42 không hề giảm theo SNR!</strong></li>
+            <li><strong>Đo đạc trên Test Set (Feature SNR = |μ|/σ):</strong>
+              <div class="formula-box">
+                QPSK (+14 dB): |μ|/σ = <strong>14.51</strong> (rất rõ)<br>
+                QPSK (-4 dB): |μ|/σ = <strong>0.64</strong> (chìm dưới nhiễu!)<br>
+                16QAM (-4 dB): |μ|/σ = <strong>0.38</strong> (hoàn toàn ngẫu nhiên)
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 12 -->
+  <div class="slide-body" data-slide="12" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <h1 class="slide-title">Lỗi Gốc rễ 2: Tại sao 1D-CNN Vượt trội ở SNR Thấp?</h1>
+    <p class="slide-subtitle">Bản chất của tích chập thời gian: Bộ lọc phối hợp ngầm định (Implicit Matched Filter)</p>
+    <div class="cards-grid grid-2">
+      <div class="card">
+        <div class="card-title">🔍 Nguyên lý Lọc Tương quan Thời gian</div>
+        <div class="card-content">
+          <p>Tầng Conv1D trượt các kernel W ∈ ℝ^(2×7) trên 128 mẫu I/Q:</p>
+          <div class="formula-box">
+            y_k[n] = ∑ (W_I[τ] · I[n-τ] + W_Q[τ] · Q[n-τ])
+          </div>
+          <ul>
+            <li>Backpropagation hướng các trọng số W hội tụ thành đáp ứng xung mô phỏng <strong>bộ lọc phối hợp</strong> với dạng xung RRC.</li>
+            <li>Tích phân kết hợp (Coherent Integration) giúp cộng dồn năng lượng ký hiệu có quy luật, trong khi năng lượng nhiễu trắng bị triệt tiêu một phần.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">⚖️ So sánh Bản chất Xử lý Tín hiệu</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Feature Engineering:</strong> Nâng lũy thừa bậc 4 ngay lập tức trên từng mẫu riêng rẽ (|r[n]|⁴) → <strong>Khuếch đại phi tuyến phương sai nhiễu</strong>.</li>
+            <li><strong>1D-CNN:</strong> Lọc tuyến tính qua cửa sổ thời gian (Temporal Smoothing) trước, nâng cao Effective SNR rồi mới đưa qua các hàm phi tuyến ReLU → <strong>Khử nhiễu trước khi kích hoạt</strong>.</li>
+            <li>Kết quả: 1D-CNN vượt trội +17.08% tại -4 dB và +27.91% tại 0 dB!</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 13 -->
+  <div class="slide-body" data-slide="13" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <h1 class="slide-title">Lỗi Gốc rễ 3: Điểm nghẽn 16QAM vs 64QAM</h1>
+    <p class="slide-subtitle">Sự trùng lặp hình học khi độ dài khung quan sát quá ngắn (L = 128)</p>
+    <div class="cards-grid grid-2">
+      <div class="card">
+        <div class="card-title">📏 Khoảng cách Lý thuyết & Xác suất Bayes</div>
+        <div class="card-content">
+          <ul>
+            <li>C42 lý thuyết: 16QAM (-0.680) vs 64QAM (-0.619) → Khoảng cách cực hẹp: <strong>Δ = 0.061</strong>.</li>
+            <li>Đo thực tế trên test set (SNR ≥ 10 dB, có lọc RRC):
+              <div class="formula-box">
+                16QAM: -0.551 ± 0.104<br>
+                64QAM: -0.497 ± 0.103<br>
+                Khoảng cách: 0.054 | Độ lệch chuẩn pooled: 0.103
+              </div>
+            </li>
+            <li>Chỉ số phân tách Fisher d' = 0.054 / 0.103 ≈ <strong>0.52</strong>.</li>
+            <li>Xác suất lỗi Bayes lý thuyết cho đặc trưng này: P_e = Q(d'/2) ≈ <strong>39.7%</strong> (Khớp thực tế ~34%).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🛠️ 4 Giải pháp Khắc phục Triệt để</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>1. Tăng chiều dài khung L:</strong> Vì σ ∝ 1/√L, tăng L lên 512 hoặc 1024 sẽ thu hẹp phương sai một nửa, tách rời 2 phân phối.</li>
+            <li><strong>2. Bổ sung Cumulant Bậc 6 (C63):</strong> Tỷ số C63 / C42 có độ nhạy phân tách cao hơn giữa các chòm sao QAM mật độ lớn.</li>
+            <li><strong>3. Khôi phục Định thời (Timing Recovery):</strong> Lấy mẫu đúng đỉnh mắt để loại bỏ nhiễu ISI giữa các ký hiệu.</li>
+            <li><strong>4. Kiến trúc Mạng Sâu:</strong> Sử dụng Residual 1D-CNN hoặc Complex-Valued CNN.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 14 -->
+  <div class="slide-body" data-slide="14" data-speaker="Thành viên 3 (Phút 09:30 - 15:00)">
+    <h1 class="slide-title">Kết luận & Trình diễn Live Interactive Demo</h1>
+    <p class="slide-subtitle">Tổng kết dự án và trực quan hóa thời gian thực trên Streamlit</p>
+    <div class="cards-grid grid-2">
+      <div class="card">
+        <div class="card-title">🎯 Kết luận & Khuyến nghị Kỹ thuật</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Môi trường Nhiễu nặng (SNR &lt; 0 dB):</strong> Khuyến nghị tuyệt đối sử dụng <strong>1D-CNN</strong> nhờ khả năng lọc tương quan thời gian.</li>
+            <li><strong>Môi trường IoT Tiết kiệm Năng lượng:</strong> Khuyến nghị <strong>XGBoost + Handcrafted Features</strong> khi SNR ≥ +4 dB để tối ưu độ trễ (0.08 ms) và kích thước (0.8 MB).</li>
+            <li><strong>Tri thức Vật lý:</strong> Feature Engineering giúp giải thích minh bạch hệ thống và cung cấp căn cứ thiết kế cho AI.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">💻 Trình diễn Live Streamlit Dashboard</div>
+        <div class="card-content">
+          <ul>
+            <li><strong>Trực quan hóa tức thời:</strong> Constellation chòm sao I/Q, giản đồ thời gian và phổ công suất FFT.</li>
+            <li><strong>Thực nghiệm Interactive SNR:</strong> Kéo thanh trượt từ +18 dB về -4 dB.</li>
+            <li><strong>Đối đầu Trực tiếp:</strong> Kiểm chứng tại -4 dB khi XGBoost suy sụp còn 1D-CNN dự đoán chính xác với Confidence Bar cao.</li>
+          </ul>
+          <div style="margin-top: 15px; text-align: center;">
+            <span class="badge badge-success" style="font-size: 0.9rem; padding: 6px 16px;">
+              🚀 Sẵn sàng trả lời Q&A từ Hội đồng Giảng viên!
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Navigation -->
+  <div class="slide-footer">
+    <button class="nav-btn" id="prev-btn" onclick="prevSlide()">◀ Trang trước (Phím ←)</button>
+    <div class="slide-counter" id="counter">Slide 1 / 14</div>
+    <button class="nav-btn" id="next-btn" onclick="nextSlide()">Trang sau (Phím →) ▶</button>
+  </div>
+</div>
+
+<script>
+  let currentSlide = 1;
+  const totalSlides = 14;
+
+  function showSlide(index) {
+    if (index < 1) index = 1;
+    if (index > totalSlides) index = totalSlides;
+    currentSlide = index;
+
+    document.querySelectorAll('.slide-body').forEach(el => el.classList.remove('active'));
+    const activeEl = document.querySelector(`.slide-body[data-slide="${currentSlide}"]`);
+    if (activeEl) {
+      activeEl.classList.add('active');
+      document.getElementById('speaker-name').innerText = activeEl.getAttribute('data-speaker');
+    }
+    document.getElementById('counter').innerText = `Slide ${currentSlide} / ${totalSlides}`;
+  }
+
+  function nextSlide() {
+    if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+  }
+
+  function prevSlide() {
+    if (currentSlide > 1) showSlide(currentSlide - 1);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      prevSlide();
+    }
+  });
+</script>
+</body>
+</html>

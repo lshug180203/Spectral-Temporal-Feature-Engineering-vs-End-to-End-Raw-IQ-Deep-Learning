@@ -220,6 +220,38 @@ def apply_awgn_and_rms_norm(
     return r_norm.astype(np.complex64), iq_tensor
 
 
+def _generate_split(
+    bursts_per_cell: int,
+    burst_length: int,
+    snr_grid: np.ndarray,
+    split_seed: int
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Generates one data split (train, val, or test) from its OWN RandomState(split_seed).
+    Every (modulation, SNR) cell receives `bursts_per_cell` bursts, so classes and SNR
+    points are balanced. Symbols, noise, and initial phases all come from this
+    split-private generator and are therefore independent of the other splits.
+    """
+    rng = np.random.RandomState(split_seed)
+    iq_list, label_list, snr_list = [], [], []
+
+    for mod_idx, mod_type in enumerate(MOD_CLASSES):
+        for snr in snr_grid:
+            for _ in range(bursts_per_cell):
+                clean = generate_burst_signal(mod_type, burst_length, rng=rng)
+                _, iq_tensor = apply_awgn_and_rms_norm(clean, snr, rng=rng)
+                iq_list.append(iq_tensor)
+                label_list.append(mod_idx)
+                snr_list.append(snr)
+
+    iq = np.array(iq_list, dtype=np.float32)        # [N, 2, 128]
+    labels = np.array(label_list, dtype=np.int64)    # [N]
+    snrs = np.array(snr_list, dtype=np.float32)      # [N]
+
+    order = rng.permutation(len(labels))
+    return iq[order], labels[order], snrs[order]
+
+
 def generate_amc_dataset(
     bursts_per_class_snr: int = 100,
     burst_length: int = 128,
@@ -228,8 +260,14 @@ def generate_amc_dataset(
     cache_path: Optional[str] = None
 ) -> Dict[str, np.ndarray]:
     """
-    Generates or loads cached standardized AMC dataset across 8 classes and 15 SNR points.
-    Strictly partitions into 70% Train, 15% Validation, 15% Test with zero data leakage.
+    Generates or loads the standardized AMC dataset across 8 classes and 15 SNR points.
+
+    Anti-leakage design:
+      * 70% / 15% / 15% Train / Validation / Test per (modulation, SNR) cell.
+      * Each split is synthesized from an INDEPENDENT RandomState:
+            train -> seed, validation -> seed + 1, test -> seed + 2.
+        No test burst shares a synthetic seed, symbol sequence, noise realization,
+        or channel instance with any training burst.
 
     Dataset dictionary keys:
       - 'X_train_iq': [N_train, 2, 128]
@@ -253,68 +291,30 @@ def generate_amc_dataset(
         snr_grid = CALIBRATED_SNR_GRID
 
     set_seed(seed)
-    rng = np.random.RandomState(seed)
+
+    n_train = int(round(0.70 * bursts_per_class_snr))
+    n_val = int(round(0.15 * bursts_per_class_snr))
+    n_test = bursts_per_class_snr - n_train - n_val
 
     print(f"[*] Generating AMC Dataset: {len(MOD_CLASSES)} classes, {len(snr_grid)} SNRs, "
-          f"{bursts_per_class_snr} bursts/class/SNR (Total = {len(MOD_CLASSES) * len(snr_grid) * bursts_per_class_snr} bursts)...")
+          f"{bursts_per_class_snr} bursts/class/SNR "
+          f"(train/val/test per cell = {n_train}/{n_val}/{n_test}, "
+          f"independent seeds {seed}/{seed + 1}/{seed + 2})...")
 
-    all_iq = []
-    all_labels = []
-    all_snrs = []
-
-    for mod_idx, mod_type in enumerate(MOD_CLASSES):
-        for snr in snr_grid:
-            for _ in range(bursts_per_class_snr):
-                clean = generate_burst_signal(mod_type, burst_length, rng=rng)
-                _, iq_tensor = apply_awgn_and_rms_norm(clean, snr, rng=rng)
-                all_iq.append(iq_tensor)
-                all_labels.append(mod_idx)
-                all_snrs.append(snr)
-
-    all_iq = np.array(all_iq, dtype=np.float32)      # [N, 2, 128]
-    all_labels = np.array(all_labels, dtype=np.int64) # [N]
-    all_snrs = np.array(all_snrs, dtype=np.float32)   # [N]
-
-    # Strict Anti-Leakage Partitioning: 70% Train, 15% Validation, 15% Test
-    # Stratified per (mod_type, snr) cell
-    total_samples = len(all_labels)
-    train_indices = []
-    val_indices = []
-    test_indices = []
-
-    num_cells = len(MOD_CLASSES) * len(snr_grid)
-    for c in range(num_cells):
-        cell_start = c * bursts_per_class_snr
-        cell_end = (c + 1) * bursts_per_class_snr
-        indices = np.arange(cell_start, cell_end)
-        rng.shuffle(indices)
-
-        n_train = int(0.70 * bursts_per_class_snr)
-        n_val = int(0.15 * bursts_per_class_snr)
-
-        train_indices.extend(indices[:n_train])
-        val_indices.extend(indices[n_train : n_train + n_val])
-        test_indices.extend(indices[n_train + n_val :])
-
-    train_indices = np.array(train_indices)
-    val_indices = np.array(val_indices)
-    test_indices = np.array(test_indices)
-
-    # Shuffle each partition independently
-    rng.shuffle(train_indices)
-    rng.shuffle(val_indices)
-    rng.shuffle(test_indices)
+    X_train, y_train, s_train = _generate_split(n_train, burst_length, snr_grid, seed)
+    X_val, y_val, s_val = _generate_split(n_val, burst_length, snr_grid, seed + 1)
+    X_test, y_test, s_test = _generate_split(n_test, burst_length, snr_grid, seed + 2)
 
     dataset = {
-        'X_train_iq': all_iq[train_indices],
-        'y_train': all_labels[train_indices],
-        'snr_train': all_snrs[train_indices],
-        'X_val_iq': all_iq[val_indices],
-        'y_val': all_labels[val_indices],
-        'snr_val': all_snrs[val_indices],
-        'X_test_iq': all_iq[test_indices],
-        'y_test': all_labels[test_indices],
-        'snr_test': all_snrs[test_indices],
+        'X_train_iq': X_train,
+        'y_train': y_train,
+        'snr_train': s_train,
+        'X_val_iq': X_val,
+        'y_val': y_val,
+        'snr_val': s_val,
+        'X_test_iq': X_test,
+        'y_test': y_test,
+        'snr_test': s_test,
         'classes': np.array(MOD_CLASSES),
         'snr_grid': np.array(snr_grid)
     }
@@ -325,7 +325,8 @@ def generate_amc_dataset(
         print(f"[OK] Saved standardized AMC dataset to: {cache_path}")
 
     print(f"[OK] Dataset partitioned: Train = {len(dataset['y_train'])}, "
-          f"Val = {len(dataset['y_val'])}, Test = {len(dataset['y_test'])} | Zero Leakage Guaranteed.")
+          f"Val = {len(dataset['y_val'])}, Test = {len(dataset['y_test'])} | "
+          f"Independent per-split seeds -> zero train/test leakage.")
 
     return dataset
 

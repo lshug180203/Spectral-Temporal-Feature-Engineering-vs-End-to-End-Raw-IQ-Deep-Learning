@@ -1,36 +1,41 @@
 ================================================================================
 EE136 CAPSTONE MINI-PROJECT - TOPIC 02: ROOT-CAUSE FAILURE ANALYSIS REPORT
+(all numbers computed from the held-out test set)
 ================================================================================
 
-[1] LOW-SNR NOISE COLLAPSE REGIME (SNR = -4 dB):
-  • Feature-Based XGBoost Accuracy: 25.83%
-  • End-to-End 1D-CNN Accuracy:    40.83% (Delta = +15.00%)
-  • Physical Root Cause:
-    Higher-Order Cumulants (C40, C42) depend on 4th moments E[|z|^4] and E[z^4].
-    Under AWGN r[n] = s[n] + w[n], expanding |r[n]|^4 yields severe noise cross-terms:
-      |r[n]|^4 = (|s[n]|^2 + |w[n]|^2 + 2 Re{s[n] w*[n]})^2.
-    Over finite burst length L = 128, the sample variance of the cumulant estimator explodes:
-      Var(C42_est) ~ O(sigma_w^4 / L) or O(sigma_w^8 / L).
-    At SNR = -4 dB, noise power sigma_w^2 > signal power E_s, completely corrupting
-    the cumulant feature space. In contrast, 1D-CNN applies learned spatio-temporal
-    convolutional filters (kernels of size 7, 5, 3) acting as coherent bandpass match-filters
-    that integrate and average out wideband out-of-band Gaussian noise before non-linear activation.
+[1] LOW-SNR COLLAPSE OF CUMULANT FEATURES (SNR = -4 dB, n = 480 bursts)
+  - XGBoost accuracy: 31.67% | 1D-CNN accuracy: 48.75% (CNN - XGB = +17.08 pts)
+  - Mechanism A (contraction / bias): 4th-order cumulants of independent signals add,
+    and the 4th-order cumulant of Gaussian noise is 0. After RMS normalization:
+        C42_obs = C42_signal * (rho / (1 + rho))^2
+    At -4 dB, rho = 0.398 -> contraction factor = 0.081.
+  - Mechanism B (estimator variance, finite L = 128): the sample estimate of M42 averages |r|^4;
+    its variance contains 8th-order noise moments, so the standard deviation of C42_hat does NOT
+    shrink with SNR while its mean contracts toward 0.
+  - Measured on the test set (feature C42), |mean| / std = 'feature SNR':
+      QPSK   -4 dB: mean=-0.098, std=0.154, |mu|/sigma=0.64 | +4 dB: mean=-0.436, std=0.094, |mu|/sigma=4.63 | +14 dB: mean=-0.813, std=0.056, |mu|/sigma=14.51
+      16QAM  -4 dB: mean=-0.076, std=0.200, |mu|/sigma=0.38 | +4 dB: mean=-0.315, std=0.095, |mu|/sigma=3.30 | +14 dB: mean=-0.534, std=0.102, |mu|/sigma=5.24
+      64QAM  -4 dB: mean=-0.110, std=0.124, |mu|/sigma=0.89 | +4 dB: mean=-0.286, std=0.099, |mu|/sigma=2.87 | +14 dB: mean=-0.506, std=0.094, |mu|/sigma=5.35
+    When |mu|/sigma < 1 the class cumulant is below its own estimation noise.
 
-[2] DENSE CONSTELLATION LATTICE AMBIGUITY (16QAM vs. 64QAM @ High SNR >= 10 dB):
-  • XGBoost QAM Discrimination Accuracy: 64.67%
-  • 1D-CNN QAM Discrimination Accuracy:  54.00%
-  • Physical Root Cause:
-    Theoretical 4th-order cumulants of normalized square QAM constellations are mathematically close:
-      C42(16QAM) = -0.6800
-      C42(64QAM) = -0.6190  (Difference delta = 0.061)
-    Under finite-sample estimation (L=128), statistical variance often overlaps this 0.061 gap,
-    causing classical feature classifiers to confuse 16QAM and 64QAM.
-    1D-CNN overcomes this by learning complex transition trajectories and multilevel peak-to-average
-    ratio (PAPR) characteristics across multiple consecutive samples.
+[2] 16QAM vs 64QAM AMBIGUITY (SNR >= 10 dB)
+  - Theoretical noise-free cumulants (1 sample/symbol): C42(16QAM) = -0.680, C42(64QAM) = -0.619 (gap 0.061).
+  - Measured C42 on test set (4 samples/symbol, pulse shaped, L=128, SNR>=10 dB):
+      16QAM: -0.551 +- 0.104 | 64QAM: -0.497 +- 0.103 | gap = 0.054
+  - Discriminability d' = gap / pooled_std = 0.52 -> Bayes error for this single feature ~ 39.7%
+  - Observed 16QAM->64QAM / 64QAM->16QAM confusion:
+      XGBoost: 34.0% / 30.0%
+      1D-CNN : 34.7% / 36.7%
+  - Proposed remedies (NOT yet evaluated by this project): longer bursts (sigma ~ 1/sqrt(L)),
+    6th-order cumulants, timing recovery to 1 sample/symbol, deeper residual 1D-CNN, more training data.
 
-[3] CONTINUOUS PHASE TRAJECTORY (CPFSK vs. GFSK):
-  • CPFSK and GFSK both exhibit constant envelopes (|z[n]| = 1.0) and identical C42 = -1.0.
-  • However, their differential phase statistics (Delta_phi) and FFT Spectral Spread differ sharply:
-    GFSK passes binary data through a Gaussian filter (BT=0.5), resulting in a significantly
-    narrower Spectral Spread and smaller differential phase std than CPFSK.
+[3] CPFSK vs GFSK (SNR >= 10 dB): constant envelope, similar C42, differ in spectrum / phase
+  - C42              CPFSK = -0.9228 +- 0.0546 | GFSK = -0.9439 +- 0.0633
+  - spectral_spread  CPFSK = +0.0892 +- 0.0121 | GFSK = +0.0735 +- 0.0149
+  - phase_diff_std   CPFSK = +0.4451 +- 0.0379 | GFSK = +0.3206 +- 0.0512
+  - XGBoost CPFSK->GFSK confusion: 0.3% | CNN: 0.0%
+
+[4] STATISTICAL CAVEAT
+  - Each SNR point has n = 480 test bursts; the 95% CI on an accuracy near 50% is +-4.5 pts.
+    Differences smaller than the CI (typically at high SNR) are not statistically significant.
 ================================================================================

@@ -6,10 +6,10 @@ Capstone Mini-Project - Topic 02: Spectral & Temporal Feature Engineering
 ================================================================================
 Script: main.py
 Description:
-  1-Command End-to-End Execution Pipeline (< 30 seconds):
+  End-to-End Execution Pipeline (first run: a few minutes on CPU; later runs reuse cached data):
     1. Deterministic seed initialization (seed=42).
     2. Baseband I/Q burst generation & per-burst RMS normalization (L=128, 8 classes, 15 SNRs).
-    3. Strict anti-leakage partition (70% Train, 15% Val, 15% Test).
+    3. Anti-leakage partition 70/15/15 with INDEPENDENT seeds per split (train=42, val=43, test=44).
     4. Higher-order cumulant, differential phase, & FFT spectral feature extraction.
     5. Training Branch 1 (StandardScaler + XGBoost & RBF-SVM).
     6. Training Branch 2 (End-to-End PyTorch 1D-CNN with validation checkpointing).
@@ -22,6 +22,7 @@ Description:
 import os
 import sys
 import time
+import json
 import numpy as np
 
 if hasattr(sys.stdout, 'reconfigure'):
@@ -45,6 +46,7 @@ from utils.feature_extractor import extract_features_batch
 from utils.metrics_plots import (
     evaluate_models_per_snr,
     plot_snr_curves,
+    plot_training_curves,
     plot_confusion_matrices_at_regimes,
     print_failure_analysis_report
 )
@@ -53,7 +55,7 @@ from models.cnn1d import CNN1DPipeline
 
 
 def run_pipeline(
-    bursts_per_class_snr: int = 100,
+    bursts_per_class_snr: int = 400,
     cnn_epochs: int = 12,
     seed: int = 42,
     cache_dataset: bool = True
@@ -74,7 +76,8 @@ def run_pipeline(
     os.makedirs(saved_models_dir, exist_ok=True)
     os.makedirs(results_dir, exist_ok=True)
 
-    cache_path = os.path.join(data_dir, f'amc_dataset_seed{seed}.npz') if cache_dataset else None
+    tag = f'seed{seed}_n{bursts_per_class_snr}'
+    cache_path = os.path.join(data_dir, f'amc_dataset_{tag}.npz') if cache_dataset else None
 
     # Step 1: Baseband Signal Generation & Anti-Leakage Partition
     print("\n--- STEP 1: PHYSICAL BASEBAND SIGNAL GENERATION & RMS NORMALIZATION ---")
@@ -100,7 +103,7 @@ def run_pipeline(
 
     # Step 2: Vectorized Physical Feature Extraction
     print("\n--- STEP 2: PHYSICAL DOMAIN FEATURE EXTRACTION (CUMULANTS + FFT) ---")
-    feat_cache = os.path.join(data_dir, f'features_seed{seed}.npz')
+    feat_cache = os.path.join(data_dir, f'features_{tag}.npz')
     if os.path.exists(feat_cache):
         print(f"[*] Loading cached features from: {feat_cache}")
         f_data = np.load(feat_cache)
@@ -133,7 +136,7 @@ def run_pipeline(
     print("\n--- STEP 4: BRANCH 2 - END-TO-END RAW I/Q 1D-CNN (PYTORCH) ---")
     cnn_pipeline = CNN1DPipeline(num_classes=len(MOD_CLASSES))
     cnn_ckpt_path = os.path.join(saved_models_dir, 'best_cnn1d_model.pt')
-    cnn_pipeline.train_pipeline(
+    history = cnn_pipeline.train_pipeline(
         X_train_iq, y_train,
         X_val_iq, y_val,
         epochs=cnn_epochs,
@@ -141,6 +144,7 @@ def run_pipeline(
         lr=1e-3,
         save_path=cnn_ckpt_path
     )
+    plot_training_curves(history, save_path=os.path.join(results_dir, 'cnn_training_curves.png'))
 
     # Step 5: Calibrated 15-Point SNR Grid Benchmark Evaluation
     print("\n--- STEP 5: CALIBRATED 15-POINT SNR EVALUATION & BENCHMARKING ---")
@@ -187,7 +191,8 @@ def run_pipeline(
         f.write(report_text)
 
     # Save numeric benchmark results
-    np.savez_compressed(os.path.join(results_dir, 'benchmark_metrics.npz'), **snr_results)
+    with open(os.path.join(results_dir, 'benchmark_metrics.json'), 'w', encoding='utf-8') as f:
+        json.dump(snr_results, f, indent=2)
 
     total_duration = time.time() - total_start_time
     print("\n" + "=" * 80)
@@ -199,4 +204,4 @@ def run_pipeline(
 
 
 if __name__ == '__main__':
-    run_pipeline(bursts_per_class_snr=100, cnn_epochs=12, seed=42)
+    run_pipeline(bursts_per_class_snr=400, cnn_epochs=12, seed=42)

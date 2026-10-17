@@ -159,10 +159,15 @@ def train_ml_models(
     y_train: np.ndarray,
     X_val: np.ndarray,
     y_val: np.ndarray,
-    save_dir: str = 'saved_models'
+    save_dir: str = 'saved_models',
+    svm_max_train: int = 12000
 ) -> Tuple[FeatureMLClassifier, FeatureMLClassifier]:
     """
     Trains both XGBoost and RBF-SVM classifiers and saves them to disk.
+
+    XGBoost uses the full training set. The RBF-SVM (cost ~ O(n^2) with probability
+    calibration) is trained on a seeded random subset of at most `svm_max_train`
+    training bursts; validation and test sets are untouched.
     """
     os.makedirs(save_dir, exist_ok=True)
 
@@ -171,9 +176,14 @@ def train_ml_models(
     xgb_clf.fit(X_train, y_train, X_val, y_val)
     xgb_clf.save(os.path.join(save_dir, 'xgboost_amc.joblib'))
 
-    # 2. RBF-SVM Classifier
+    # 2. RBF-SVM Classifier (seeded subsample for tractable training time)
+    X_svm, y_svm = X_train, y_train
+    if len(X_train) > svm_max_train:
+        sub_idx = np.random.RandomState(42).choice(len(X_train), svm_max_train, replace=False)
+        X_svm, y_svm = X_train[sub_idx], y_train[sub_idx]
+        print(f"[*] RBF-SVM trained on a seeded subset of {svm_max_train} / {len(X_train)} training bursts.")
     svm_clf = FeatureMLClassifier(model_type='svm', random_state=42)
-    svm_clf.fit(X_train, y_train, X_val, y_val)
+    svm_clf.fit(X_svm, y_svm, X_val, y_val)
     svm_clf.save(os.path.join(save_dir, 'svm_amc.joblib'))
 
     return xgb_clf, svm_clf
