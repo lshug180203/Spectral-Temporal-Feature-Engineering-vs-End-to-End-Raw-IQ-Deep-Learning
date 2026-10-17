@@ -1,6 +1,5 @@
 # EE136IU: Machine Learning for Wireless Communications
-## Capstone Mini-Project — Topic 02
-### **Spectral & Temporal Feature Engineering vs. End-to-End Raw I/Q Deep Learning (Automatic Modulation Classification - AMC)**
+## **Spectral & Temporal Feature Engineering vs. End-to-End Raw I/Q Deep Learning (Automatic Modulation Classification - AMC)**
 
 **Department of Telecommunications — School of Electrical Engineering**  
 **Vietnam National University Ho Chi Minh City • International University (VNU-HCM • IU)**  
