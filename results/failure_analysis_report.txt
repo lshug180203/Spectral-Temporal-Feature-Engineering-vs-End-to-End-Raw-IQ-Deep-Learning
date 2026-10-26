@@ -4,7 +4,7 @@ EE136 CAPSTONE MINI-PROJECT - TOPIC 02: ROOT-CAUSE FAILURE ANALYSIS REPORT
 ================================================================================
 
 [1] LOW-SNR COLLAPSE OF CUMULANT FEATURES (SNR = -4 dB, n = 480 bursts)
-  - XGBoost accuracy: 31.67% | 1D-CNN accuracy: 48.75% (CNN - XGB = +17.08 pts)
+  - XGBoost accuracy: 31.46% | 1D-CNN accuracy: 48.75% (CNN - XGB = +17.29 pts)
   - Mechanism A (contraction / bias): 4th-order cumulants of independent signals add,
     and the 4th-order cumulant of Gaussian noise is 0. After RMS normalization:
         C42_obs = C42_signal * (rho / (1 + rho))^2
@@ -24,7 +24,7 @@ EE136 CAPSTONE MINI-PROJECT - TOPIC 02: ROOT-CAUSE FAILURE ANALYSIS REPORT
       16QAM: -0.551 +- 0.104 | 64QAM: -0.497 +- 0.103 | gap = 0.054
   - Discriminability d' = gap / pooled_std = 0.52 -> Bayes error for this single feature ~ 39.7%
   - Observed 16QAM->64QAM / 64QAM->16QAM confusion:
-      XGBoost: 34.0% / 30.0%
+      XGBoost: 33.7% / 30.0%
       1D-CNN : 34.7% / 36.7%
   - Proposed remedies (NOT yet evaluated by this project): longer bursts (sigma ~ 1/sqrt(L)),
     6th-order cumulants, timing recovery to 1 sample/symbol, deeper residual 1D-CNN, more training data.

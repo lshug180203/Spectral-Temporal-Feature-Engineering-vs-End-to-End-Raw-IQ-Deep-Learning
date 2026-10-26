@@ -7,6 +7,8 @@ data/
 
 # Slide presentation artifacts excluded from repo
 slides_deck.html
+*.html
 *.pdf
 *.pptx
 PRESENTATION_SLIDES_TOPIC2.md
+
